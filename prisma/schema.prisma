@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Gym {
+  id          Int        @id @default(autoincrement())
+  description String
+  Training    Training[]
+}
+
+model Client {
+  name         String         @id
+  email        String
+  phone        String
+  Reservations Reservations[]
+}
+
+model Payment {
+  id            Int            @id @default(autoincrement())
+  time          DateTime
+  total         Int
+  paymentNumber String
+  Reservations  Reservations[]
+}
+
+model Coach {
+  name     String     @id
+  email    String
+  phone    String
+  Training Training[]
+}
+
+model Training {
+  id           Int      @id @default(autoincrement())
+  name         String
+  price        Int
+  duration     Int
+  level        String
+  startingTime DateTime
+
+  coach        Coach          @relation(fields: [coachName], references: [name])
+  coachName    String
+  gym          Gym            @relation(fields: [gymId], references: [id])
+  gymId        Int
+  Reservations Reservations[]
+}
+
+model Reservations {
+  training   Training @relation(fields: [trainingId], references: [id])
+  trainingId Int
+
+  client     Client @relation(fields: [clientName], references: [name])
+  clientName String
+
+  payment   Payment @relation(fields: [paymentId], references: [id])
+  paymentId Int
+
+  @@id([trainingId, clientName])
+}
